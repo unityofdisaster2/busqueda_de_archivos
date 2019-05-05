@@ -102,7 +102,7 @@ public class DatagramClient {
     public String preguntarArchivo(String filename){
         try {
             //strBytes = filename.getBytes();
-            ds.switchFlag();
+
             //primero se envia host del cliente que consulta
             envios = new DatagramPacket(hostLocal.getBytes(),hostLocal.length(),hostSiguiente,ptoSiguiente);
             cl.send(envios);
@@ -116,13 +116,7 @@ public class DatagramClient {
             //se recibe respuesta del servidor
             cl.receive(recepciones);
             System.out.println("se ha recibido algo en cliente datagrama: "+new String(recepciones.getData(),0,recepciones.getLength()));
-            if(flag){
-                flag = false;
-                return new String(recepciones.getData(),0,recepciones.getLength());
-                
-            }else{
-                return "";
-            }
+            return new String(recepciones.getData(),0,recepciones.getLength());
             
         } catch (IOException ex) {
             ex.printStackTrace();

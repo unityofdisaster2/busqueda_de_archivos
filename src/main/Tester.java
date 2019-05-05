@@ -45,17 +45,12 @@ public class Tester implements Runnable{
     
     
     public static void main(String[] args) {
-        Tester test = new Tester();
-        Thread t1 = new Thread(test);
-        t1.start();
-        try {
-            DatagramSocket cl = new DatagramSocket(4000);
-            String mensaje = "mensaje desde cliente";
-            DatagramPacket  p = new DatagramPacket(mensaje.getBytes(),mensaje.length(),InetAddress.getByName("192.168.56.1"),9000);
-            cl.send(p);
-        } catch (Exception ex) {
-            Logger.getLogger(Tester.class.getName()).log(Level.SEVERE, null, ex);
+        boolean bandera = false;
+        System.out.println(bandera);
+        if(!bandera){
+            System.out.println("lo que sea");
         }
+        System.out.println(bandera);
         
 
     }

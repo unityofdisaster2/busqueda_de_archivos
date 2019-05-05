@@ -148,13 +148,10 @@ public class DatagramServer implements Runnable {
         try {
             s = new DatagramSocket(ptoLocal, InetAddress.getByName(hostLocal));
 
-            System.out.println("puerto cliente datagrama:"+s.getPort());
-            System.out.println("direccion ip:"+s.getInetAddress());
             String mensaje, archivo, hostConsulta;
             for (;;) {
-                System.out.println("servidor entra a ciclo");
+                System.out.println("estado de la bandera:"+flag);
                 //Enviar primero host y opcionalmente puerto para que el servidor pueda responder
-                System.out.println("Sobrepasa la bandera");
                 recepciones = new DatagramPacket(new byte[100], 100);
                 s.receive(recepciones);
 
@@ -164,7 +161,7 @@ public class DatagramServer implements Runnable {
 
                 archivo = new String(recepciones.getData(), 0, recepciones.getLength());    
                 
-                if (!flag) {
+                if (flag == false) {
                     System.out.println(recepciones.getPort()+":"+recepciones.getAddress().getHostAddress());
                     control.addMensaje("se recibe peticion de busqueda de archivo: " + archivo);
                     File f = new File(Integer.toString(ptoLocal) + "/" + archivo);

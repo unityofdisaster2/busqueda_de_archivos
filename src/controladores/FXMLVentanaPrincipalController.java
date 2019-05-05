@@ -82,7 +82,7 @@ public class FXMLVentanaPrincipalController implements Initializable{
             a.showAndWait();
         }else{
             Alert b;
-            nodo.getDc().switchFlag();
+            nodo.getDs().switchFlag();
             String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
             System.out.println("respuesta del servidor"+respuesta);
             if(respuesta.equals("-1")){
@@ -107,7 +107,9 @@ public class FXMLVentanaPrincipalController implements Initializable{
         servidores.getItems().clear();
         servidores.refresh();
         elementosServidores = FXCollections.observableList(lista);
-        servidores.setItems(elementosServidores);
+        try{
+            servidores.setItems(elementosServidores);        
+        }catch(Exception e){}
         servidores.refresh();
         
     }

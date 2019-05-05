@@ -106,6 +106,10 @@ public class Nodo {
         return dc;
     }
     
+    public DatagramServer getDs(){
+        return ds;
+    }
+    
     public void setControlador(FXMLVentanaPrincipalController controlador){
         this.controlador = controlador;
     }
