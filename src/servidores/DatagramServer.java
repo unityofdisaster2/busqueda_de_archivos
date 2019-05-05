@@ -171,7 +171,7 @@ public class DatagramServer implements Runnable {
                         envios = new DatagramPacket(confirmacion.getBytes(), confirmacion.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
                         s.send(envios);
                     } else {
-                        control.addMensaje("archivo "+ archivo+" no encontrado en este nodo, se pregunta al siguiente");
+                        control.addMensaje("archivo "+ archivo+" no encontrado en este nodo");
                         mensaje = dc.preguntarArchivo(archivo);
                         envios = new DatagramPacket(mensaje.getBytes(), mensaje.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
                         //se envia de vuelta
@@ -182,6 +182,7 @@ public class DatagramServer implements Runnable {
                     System.out.println("se llega a nodoo de origen");
                     System.out.println(recepciones.getPort()+":"+recepciones.getAddress().getHostAddress());
                     mensaje = "-1";
+                    control.addMensaje("no se encontro archivo en ningun nodo");
                     envios = new DatagramPacket(mensaje.getBytes(), mensaje.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
                     s.send(envios);
                     flag = false;

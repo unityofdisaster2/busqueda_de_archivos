@@ -61,9 +61,7 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                 Parent bp;
                 try {
                     //se carga la vista de la ventana principal
-                    
-                    
-                    
+
                     bp = loader.load();
                     Stage stage = new Stage();
                     stage.setTitle("Ventana Principal: " + puerto.getText());
@@ -75,18 +73,18 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                     Nodo nodo = new Nodo(pto);
                     System.out.println(nodo);
                     nodo.setControlador(controller);
-                    
+
                     nodo.inicializarClienteMulticast();
                     nodo.iniciarClienteMulticast();
-                    nodo.getMc().enviarPuerto(puerto.getText(),(InetAddress.getLocalHost().getHostAddress()).trim());
+                    nodo.getMc().enviarPuerto(puerto.getText(), (InetAddress.getLocalHost().getHostAddress()).trim());
                     nodo.setDireccionIP((InetAddress.getLocalHost().getHostAddress()).trim());
-                    controller.setNodo(nodo);                    
-                    
+                    controller.setNodo(nodo);
+
                     controller.postInicializacion();
                     Scene scene = new Scene(bp);
                     scene.getStylesheets().add("/styles/Styles.css");
                     stage.setScene(scene);
-                    
+
                     //se especifica quien es la ventana padre de la nueva ventana que sera abierta
                     stage.initOwner(ap.getScene().getWindow());
 
@@ -95,15 +93,16 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                     //se cierran las ventanas que esten abiertas
                     ((Stage) bp.getScene().getWindow()).close();
                     ((Stage) ap.getScene().getWindow()).close();
-                    
+
                     //se agrega metodo al stage para manejar el cierre de ventana y finalizar completamente el programa
                     stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                          public void handle(WindowEvent we) {
-                              
-                              nodo.getMc().eliminarPuerto(puerto.getText());
-                              System.exit(0);
-                          }
-                      });   
+                        public void handle(WindowEvent we) {
+
+                            nodo.getMc().eliminarPuerto(puerto.getText());
+
+                            System.exit(0);
+                        }
+                    });
                     //se muestra la ventana principal
                     stage.show();
                 } catch (IOException ex) {

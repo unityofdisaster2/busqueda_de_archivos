@@ -56,41 +56,49 @@ public class MulticastServer implements Runnable {
                     s.receive(recibidos);
                     //posteriormente se recibe la direccion IP
                     hostRecibido = new String(recibidos.getData(), 0, recibidos.getLength());
-                    puertoServicio.put(ptoRecibido, hostRecibido);
+                    if (!puertoServicio.containsKey(ptoRecibido)) {
+                        puertoServicio.put(ptoRecibido, hostRecibido);
 
-                    //se manda mensaje para que el cliente se prepare para actualizar la lista de nodos activos
-                    //nota: este paso se podria quitar ya que se diseño el servidor para que en los unicos mensajes
-                    //que maneja se actualice la tabla
-                    String aux = "actualizar";
-                    enviados = new DatagramPacket(aux.getBytes(), aux.length(), gpo, 9999);
-                    s.send(enviados);
+                        //se manda mensaje para que el cliente se prepare para actualizar la lista de nodos activos
+                        //nota: este paso se podria quitar ya que se diseño el servidor para que en los unicos mensajes
+                        //que maneja se actualice la tabla
+                        String aux = "actualizar";
+                        enviados = new DatagramPacket(aux.getBytes(), aux.length(), gpo, 9999);
+                        s.send(enviados);
 
-                    int[] auxArr = new int[puertoServicio.size()];
-                    int index = 0;
-                    //se guardan los nodos por orden de aparicion en un arreglo auxiliar
-                    for (int llaves : puertoServicio.keySet()) {
-                        auxArr[index] = llaves;
-                        index++;
+                        int[] auxArr = new int[puertoServicio.size()];
+                        int index = 0;
+                        //se guardan los nodos por orden de aparicion en un arreglo auxiliar
+                        for (int llaves : puertoServicio.keySet()) {
+                            auxArr[index] = llaves;
+                            index++;
+                        }
+                        //se ordenan puertos en forma ascendente
+                        Arrays.sort(auxArr);
+
+                        LinkedHashMap<Integer, String> res = new LinkedHashMap<>();
+                        //se guardan nodos y su host asociados en una nueva estructura
+                        for (int i = 0; i < auxArr.length; i++) {
+                            res.put(auxArr[i], puertoServicio.get(auxArr[i]));
+                        }
+
+                        //se convierte estructura en arreglo de bytes para ser enviado como datagrama
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(baos);
+                        oos.writeObject(res);
+                        byte[] lst = baos.toByteArray();
+                        // se envia estructura al grupo que este conectado al puerto 9999
+                        enviados = new DatagramPacket(lst, lst.length, gpo, 9999);
+                        s.send(enviados);
+
+                    } else {
+                        String error = "-1";
+                        enviados = new DatagramPacket(error.getBytes(), error.length(), gpo, 9999);
+                        s.send(enviados);
                     }
-                    //se ordenan puertos en forma ascendente
-                    Arrays.sort(auxArr);
-
-                    LinkedHashMap<Integer, String> res = new LinkedHashMap<>();
-                    //se guardan nodos y su host asociados en una nueva estructura
-                    for (int i = 0; i < auxArr.length; i++) {
-                        res.put(auxArr[i], puertoServicio.get(auxArr[i]));
-                    }
-
-                    //se convierte estructura en arreglo de bytes para ser enviado como datagrama
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
-                    oos.writeObject(res);
-                    byte[] lst = baos.toByteArray();
-                    // se envia estructura al grupo que este conectado al puerto 9999
-                    enviados = new DatagramPacket(lst, lst.length, gpo, 9999);
-                    s.send(enviados);
 
                 }
+
                 if (peticion.equals("3")) {
                     s.receive(recibidos);
 

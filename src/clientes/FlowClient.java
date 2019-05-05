@@ -25,16 +25,33 @@ public class FlowClient {
     private String folder;
     private FXMLVentanaPrincipalController controlador;
     
+    
+    /**
+     * Constructor para inicializar los valores del host y puerto del servidor
+     * con el que se establecera comunicacion y el nombre del folder donde
+     * se realizara la descarga
+     * @param host
+     * @param puerto
+     * @param folder 
+     */
     public FlowClient(String host, int puerto, String folder) {
         this.host = host;
         this.puerto = puerto;
         this.folder = folder;
     }
     
+    /**
+     * Metodo para establecer el controlador de la interfaz
+     * @param controlador 
+     */
     public void setControlador(FXMLVentanaPrincipalController controlador){
         this.controlador = controlador;
     }
-
+    
+    /**
+     * metodo encargado de conectar y guardar el stream de datos del socket
+     * @return 
+     */
     public boolean conectar() {
         try {
             cliente = new Socket(host, puerto);
@@ -48,6 +65,9 @@ public class FlowClient {
         return false;
     }
 
+    /**
+     * Metodo para desconectar socket del puerto y host actuales
+     */
     public void desconectar() {
         try{
             dis.close();
@@ -57,11 +77,23 @@ public class FlowClient {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+     * Metodo para establecer folder ligado a este cliente
+     * @param folder 
+     */
     public void setFolder(String folder) {
         this.folder = folder;
     }
-
+    
+    /**
+     * Metodo para realizar la descarga de un archivo en el servidor ligado
+     * a los datos proporcionados en el constructor o en los setters. Si 
+     * se encuentra el archivo con el nombre proporcionado se hace la descarga
+     * en la carpeta ligada
+     * @param nombreArchivo Recibe como argumento el nombre del archivo con
+     * su extension
+     */
     public void descargarArchivo(String nombreArchivo) {
         try{
             //se envia al servidor el nombre del archivo
@@ -89,9 +121,6 @@ public class FlowClient {
                 System.out.print("Recibido: " + porcentaje + "%\n");
             }
             escrituraArchivo.close();
-            //-------------------------------------------------------------
-            //controlador.clearProgress();
-            //-------------------------------------------------------------
             System.out.println("archivo: " + nombreArchivo + " recibido");
         }catch(Exception e){
             e.printStackTrace();

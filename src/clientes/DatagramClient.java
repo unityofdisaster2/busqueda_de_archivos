@@ -34,6 +34,12 @@ public class DatagramClient {
     private FXMLVentanaPrincipalController controlador;
     
     
+    /**
+     * Constructor de cliente de datagrama, recibe como argumento 
+     * el puerto y host del servidor al que apunta.
+     * @param ptoSiguiente 
+     * @param hostSiguiente 
+     */
     public DatagramClient(int ptoSiguiente,String hostSiguiente){
         try {
             this.ptoSiguiente = ptoSiguiente;
@@ -45,9 +51,14 @@ public class DatagramClient {
         }
     }
     
+    /**
+     * Se recibe como parametro controlador de la interfaz grafica
+     * @param controlador 
+     */
     public void setControlador(FXMLVentanaPrincipalController controlador){
         this.controlador = controlador;
     }
+    
     
     public void setHostLocal(String hostLocal){
         this.hostLocal = hostLocal;
@@ -61,6 +72,10 @@ public class DatagramClient {
         return this.ptoSiguiente;
     }
     
+    /**
+     * Setter para servidor de datagrama
+     * @param ds 
+     */
     public void setDs(DatagramServer ds){
         this.ds = ds;
     }
@@ -77,7 +92,11 @@ public class DatagramClient {
     }
     
 
-    
+    /**
+     * Metodo para conectar cliente de datagramas (se deja que el constructor
+     * ligue al cliente a un puerto por default)
+     * @return 
+     */
     public boolean conectar(){
         try {
             //para esta aplicacion no sera necesario especificar puerto de cliente
@@ -98,7 +117,17 @@ public class DatagramClient {
     public void switchFlag(){
         flag = true;
     }
-
+    
+    /**
+     * Metodo encargado de preguntar al servidor del siguiente nodo
+     * si cuenta con el archivo solicitado. 
+     * @param filename Se recibe como parametro el nombre con extension del
+     * archivo que se desea buscar
+     * @return se retorna la respuesta del servidor que puede ser:
+     * -1: No se encontro el archivo
+     * "host:puerto": datos del nodo donde se encontro el archivo para preparar
+     * la descarga
+     */
     public String preguntarArchivo(String filename){
         try {
             //strBytes = filename.getBytes();
@@ -107,15 +136,23 @@ public class DatagramClient {
             envios = new DatagramPacket(hostLocal.getBytes(),hostLocal.length(),hostSiguiente,ptoSiguiente);
             cl.send(envios);
             
+            //se despliega mensaje en interfaz grafica donde se notifica que se comenzo la busqueda
+            controlador.addMensaje("se pregunta por existencia de archivo "+filename+" a: "+hostSiguiente+":"+Integer.toString(ptoSiguiente));
+            //posteriormente se envia nombre del archivo
             envios = new DatagramPacket(filename.getBytes(),filename.length(),hostSiguiente,ptoSiguiente);
             cl.send(envios);
             
-            controlador.addMensaje("se pregunta por existencia de archivo "+filename+" a: "+hostSiguiente+":"+Integer.toString(ptoSiguiente));
+            
             recepciones = new DatagramPacket(new byte[200],200);
             
             //se recibe respuesta del servidor
             cl.receive(recepciones);
-            System.out.println("se ha recibido algo en cliente datagrama: "+new String(recepciones.getData(),0,recepciones.getLength()));
+            
+            //se retornala cadena que contiene la respuesta del servidor
+            String encontrado = new String(recepciones.getData(),0,recepciones.getLength());
+            if(!encontrado.equals("-1")){
+                controlador.addMensaje("archivo encontrado en: "+encontrado);
+            }
             return new String(recepciones.getData(),0,recepciones.getLength());
             
         } catch (IOException ex) {

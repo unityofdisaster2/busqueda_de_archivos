@@ -5,7 +5,6 @@
  */
 package controladores;
 
-
 import pnodo.Nodo;
 import java.net.URL;
 import java.util.LinkedList;
@@ -24,128 +23,124 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-
 /**
  * FXML Controller class
  *
  * @author sandu
  */
-public class FXMLVentanaPrincipalController implements Initializable{
+public class FXMLVentanaPrincipalController implements Initializable {
 
-
-
-    
     /**
      * Initializes the controller class.
      */
-    @FXML ListView<String> servidores;
-    @FXML TextArea mensajes;
-    @FXML TextField nombreArchivo;
-    @FXML Button buscar;
-    @FXML ProgressBar progreso;
-    @FXML ProgressIndicator indProgreso;
+    @FXML
+    ListView<String> servidores;
+    @FXML
+    TextArea mensajes;
+    @FXML
+    TextField nombreArchivo;
+    @FXML
+    Button buscar;
+    @FXML
+    ProgressBar progreso;
+    @FXML
+    ProgressIndicator indProgreso;
     private LinkedList<String> listaMensajes;
     private ObservableList<String> elementosServidores;
     private Nodo nodo;
-    
-    public void controlProgress(double valor){
+
+    public void controlProgress(double valor) {
         progreso.setProgress(valor);
-        indProgreso.setProgress(valor);        
+        indProgreso.setProgress(valor);
     }
-    
-    public void clearProgress(){
+
+    public void clearProgress() {
         progreso.setProgress(0.0);
         indProgreso.setProgress(0.0);
     }
-    
-    
-    public void setNodo(Nodo nodo){
+
+    public void setNodo(Nodo nodo) {
         this.nodo = nodo;
     }
-    
-    public Nodo getNodo(){
+
+    public Nodo getNodo() {
         return this.nodo;
     }
-    
-    
-    
 
-
-
-
-    
     @FXML
-    public void buscarArchivo(ActionEvent evt){
-        if(nombreArchivo.getText().equals("")){
+    public void buscarArchivo(ActionEvent evt) {
+        if (nombreArchivo.getText().equals("")) {
             //si no hay nada en el textbox se envia mensaje de error
-            Alert a = new Alert(Alert.AlertType.ERROR,"Ingrese algun nombre en el campo");
+            Alert a = new Alert(Alert.AlertType.ERROR, "Ingrese algun nombre en el campo");
             a.showAndWait();
-        }else{
+        } else {
             Alert b;
             nodo.getDs().switchFlag();
             String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
-            System.out.println("respuesta del servidor"+respuesta);
-            if(respuesta.equals("-1")){
-                b = new Alert(Alert.AlertType.INFORMATION,"No se ha encontrado el archivo");
+            System.out.println("respuesta del servidor" + respuesta);
+            if (respuesta.equals("-1")) {
+                b = new Alert(Alert.AlertType.INFORMATION, "No se ha encontrado el archivo");
                 b.showAndWait();
-                
-            }else if(!respuesta.equals("")){
-                b = new Alert(Alert.AlertType.CONFIRMATION,"Archivo encontrado en: "+respuesta+" presione aceptar para comenzar descarga");
+
+            } else if (!respuesta.equals("")) {
+                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado en: " + respuesta + " presione aceptar para comenzar descarga");
                 b.showAndWait();
-                nodo.iniciarSocketFlujo(respuesta.substring(0, respuesta.indexOf(":")), Integer.parseInt(respuesta.substring(respuesta.indexOf(":")+1, respuesta.length())));
+                nodo.iniciarSocketFlujo(respuesta.substring(0, respuesta.indexOf(":")), Integer.parseInt(respuesta.substring(respuesta.indexOf(":") + 1, respuesta.length())));
                 nodo.peticionSocketFlujo(nombreArchivo.getText());
                 nodo.desconectarSocketFlujo();
-                b = new Alert(Alert.AlertType.CONFIRMATION,"Archivo descargado");
+                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo descargado");
                 b.showAndWait();
                 clearProgress();
             }
         }
     }
-    
+
     @FXML
-    public void actualizarLista(LinkedList<String> lista){
+    public void actualizarLista(LinkedList<String> lista) {
         servidores.getItems().clear();
         servidores.refresh();
         elementosServidores = FXCollections.observableList(lista);
-        try{
-            servidores.setItems(elementosServidores);        
-        }catch(Exception e){}
+        try {
+            servidores.setItems(elementosServidores);
+        } catch (Exception e) {
+        }
         servidores.refresh();
-        
+
     }
-    
-    public void postInicializacion(){
+
+    public void postInicializacion() {
         nodo.inicializarClientes();
         nodo.inicializarServidores();
         nodo.conectarClientes();
         nodo.iniciarHilosServidores();
     }
-    
+
     @FXML
-    public void addMensaje(String mensaje){
+    public void addMensaje(String mensaje) {
         listaMensajes.add(mensaje);
         listaMensajes.add("");
         String cadenaMensajes = "";
-        for(String msjs: listaMensajes){
-            cadenaMensajes += msjs+"\n";
+        int contador = 1;
+        for (String msjs : listaMensajes) {
+            if (!msjs.equals("")) {
+                cadenaMensajes += "(" + Integer.toString(contador) + ") " + msjs + "\n";
+                contador++;
+            }else{
+                cadenaMensajes += msjs + "\n";
+            }
+
         }
-        mensajes.setText(cadenaMensajes);        
+        mensajes.setText(cadenaMensajes);
     }
-    
-    
+
     @Override
     @FXML
     public void initialize(URL url, ResourceBundle rb) {
         nombreArchivo.setPromptText("e.g. archivo.pdf");
         listaMensajes = new LinkedList<>();
 
-        //nodo.inicializarClienteMulticast();
-        //nodo.iniciarClienteMulticast();
-        
         mensajes.setEditable(false);
 
-    }    
+    }
 
-
-    
 }
