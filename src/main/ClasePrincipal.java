@@ -25,10 +25,11 @@ public class ClasePrincipal extends Application {
             //se carga el modelo grafico de la interfaz bienvenida
             Parent root = loader.load(getClass().getResource("/fxml/FXMLVentanaBienvenida.fxml"));
 
-            //se agrega elemento a 
             Scene scene = new Scene(root);
             scene.getStylesheets().add("/styles/Styles.css");
             primaryStage.setTitle("Ventana Inicial");
+            //el stage es la ventana principal donde se desplegaran los graficos
+            //se liga la escena que es donde se cargo el modelo disenado en archivo fxml
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();

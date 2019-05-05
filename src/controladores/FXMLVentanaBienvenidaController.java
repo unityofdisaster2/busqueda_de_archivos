@@ -34,7 +34,8 @@ import main.ClasePrincipal;
  * @author sandu
  */
 public class FXMLVentanaBienvenidaController implements Initializable {
-
+    
+    //declaracion de variables ligadas a la interfaz grafica
     @FXML
     Button btnConectar;
     @FXML
@@ -43,7 +44,8 @@ public class FXMLVentanaBienvenidaController implements Initializable {
     TextField puerto;
     @FXML
     AnchorPane ap;
-
+    
+    //funcion ligada al boton de la interfaz
     @FXML
     public void conectar(ActionEvent evt) {
         //si el campo de puerto esta vacio se muestra un mensaje de alerta
@@ -55,33 +57,40 @@ public class FXMLVentanaBienvenidaController implements Initializable {
             int pto = 0;
             try {
                 pto = Integer.parseInt(puerto.getText());
+                //se carga el diseno de la ventana principal
                 FXMLLoader loader = new FXMLLoader();
                 URL location = ClasePrincipal.class.getResource("/fxml/FXMLVentanaPrincipal.fxml");
                 loader.setLocation(location);
                 Parent bp;
                 try {
-                    //se carga la vista de la ventana principal
 
                     bp = loader.load();
                     Stage stage = new Stage();
                     stage.setTitle("Ventana Principal: " + puerto.getText());
                     //se carga el controlador de la ventana principal
                     FXMLVentanaPrincipalController controller = loader.<FXMLVentanaPrincipalController>getController();
-                    //se agregan valores al controlador antes de desplegar la vista en pantalla
-                    //controller.setPuerto(Integer.parseInt(puerto.getText()));
+                    
+                    
                     //se crea version inicial del nodo
                     Nodo nodo = new Nodo(pto);
                     System.out.println(nodo);
+                    //se liga el nodo con el controlador
                     nodo.setControlador(controller);
-
+                    
+                    //se inicializan valores de cliente multicast
                     nodo.inicializarClienteMulticast();
+                    //se ejecuta hilo de cliente multicast
                     nodo.iniciarClienteMulticast();
+                    //se envia puerto al servidor multicast
                     nodo.getMc().enviarPuerto(puerto.getText(), (InetAddress.getLocalHost().getHostAddress()).trim());
+                    //se establece direccion ip local
                     nodo.setDireccionIP((InetAddress.getLocalHost().getHostAddress()).trim());
+                    //se liga controlador con nodo
                     controller.setNodo(nodo);
-
+                    //se inicializa servidor de datagrama y servidor de flujo
                     controller.postInicializacion();
                     Scene scene = new Scene(bp);
+                    
                     scene.getStylesheets().add("/styles/Styles.css");
                     stage.setScene(scene);
 
@@ -110,6 +119,7 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                 }
 
             } catch (NumberFormatException nfe) {
+                //en caso de que en el textfield del puerto se ingresen letras se manda mensaje de error
                 Alert alertaPuerto = new Alert(Alert.AlertType.ERROR, "Ingrese un valor numerico");
                 alertaPuerto.showAndWait();
             }

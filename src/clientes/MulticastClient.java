@@ -229,7 +229,7 @@ public class MulticastClient implements Runnable {
         try {
             cl.receive(recibidos);
             String aux = new String(recibidos.getData(), 0, recibidos.getLength());
-            //si el mensaje enviado por el servidor fue de actualizar
+            //si el nodo que se agrego no es repetido se actualiza lista
             if (aux.equals("actualizar")) {
                 //se recibe estructura del servidor y se guarda en linkedhashMap
                 cl.receive(recibidos);

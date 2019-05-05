@@ -38,10 +38,11 @@ public class FlowServer implements Runnable{
             servidor = new ServerSocket(puerto);
             for(;;){
                 System.out.println("se llega al ciclo del servidor");
-                
+                //se espera la conexion de un cliente
                 cliente = servidor.accept();
                 System.out.println("se acepta conexion");
-                //cada que se acepta a un cliente se manda a llamar 
+                //cada que se acepta a un cliente se manda a llamar a un hilo para que atienda su solicitud
+                
                 dis = new DataInputStream(cliente.getInputStream());
                 dos = new DataOutputStream(cliente.getOutputStream());
                 Thread t = new Thread(new ClientHandler(dis, dos, cliente,puerto));

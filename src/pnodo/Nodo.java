@@ -125,12 +125,21 @@ public class Nodo {
         return this.siguiente;
     }*/
     
+    /**
+     * Metodo para unicamente inicializar valores importantes del cliente
+     * multicast
+     */
     public void inicializarClienteMulticast(){
         mc = new MulticastClient();
         getMc().setControlador(controlador);
     }
     
-    public void inicializarClientes(){
+    
+    /**
+     * Metodo para unicamente inicializar valores importantes del cliente
+     * de datagramas
+     */
+    public void inicializarClienteDatagrama(){
         //no se agrega puerto ya que por default se asigna el 9999
 
         //cliente de datagrama debe contar con direccion del siguiente nodo para consultar
@@ -138,7 +147,12 @@ public class Nodo {
         getDc().setControlador(controlador);
         
     }
-    
+    /**
+     * Metodo para inicializar valores importantes de cliente de flujo
+     * y realizar la conexion
+     * @param direccionFlujo
+     * @param puertoFlujo 
+     */
     public void iniciarSocketFlujo(String direccionFlujo, int puertoFlujo){
         fc = new FlowClient(direccionFlujo, puertoFlujo, Integer.toString(globalPort));
         fc.setControlador(controlador);
@@ -151,12 +165,19 @@ public class Nodo {
         getFc().desconectar();
     }
     
+    /**
+     * Funcion para realizar la peticion de descarga de un archivo
+     * @param filename se recibe como argumento nombre de archivo con su extension
+     */
     public void peticionSocketFlujo(String filename){
         fc.descargarArchivo(filename);
     }
     
     
-    
+    /**
+     * Metodo para unicamente establecer valores importantes que sean neceasrios
+     * para los servidores
+     */
     public void inicializarServidores(){
         ds = new DatagramServer(this.globalPort);
         ds.setHostLocal(direccionIP);
@@ -167,6 +188,9 @@ public class Nodo {
         fs = new FlowServer(this.globalPort+100);
     }
     
+    /**
+     * Metodo para ejecutar el hilo correspondiente al cliente multicast
+     */
     public void iniciarClienteMulticast(){
         getMc().conectar();
         Thread s1 = new Thread(getMc());
@@ -174,7 +198,10 @@ public class Nodo {
     }
     
     
-    
+    /**
+     * Metodo para ejecutar los hilos correspondientes a cliente de datagrama
+     * y cliente de flujo
+     */
     public void iniciarHilosServidores(){
         Thread s2 = new Thread(ds);
         Thread s3 = new Thread(fs);
@@ -182,11 +209,17 @@ public class Nodo {
         s3.start();
     }
     
-    public void conectarClientes(){
+    /**
+     * Metodo para iniciar conexion de cliente de datagramas
+     */
+    public void conectarClienteDatagrama(){
         dc.conectar();
         dc.setHostLocal(this.direccionIP);
     }
     
+    /**
+     * Metodo para finalizar conexion de cliente de datagramas
+     */
     public void desconectarClienteDatagramas(){
         dc.desconectar();
     }
@@ -196,6 +229,10 @@ public class Nodo {
         return direccionIP+":"+globalPort;
     }
     
+    /**
+     * Metodo que sera llamado cada que se actualicen los puertos ligados
+     * a este nodo
+     */
     public void actualizarPuertos(){
         dc.setPtoSiguiente(puertoSiguiente);
         dc.setHostSiguiente(direccionSiguiente);
