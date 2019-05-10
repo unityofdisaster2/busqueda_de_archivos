@@ -122,8 +122,12 @@ public class DatagramServer implements Runnable {
     }
     
     //activar bandera que indica si este nodo es el que inicio la consulta del archivo a los demas
-    public void switchFlag() {
+    public void turnOnFlag() {
         flag = true;
+    }
+    
+    public void turnOffFlag(){
+        flag = false;
     }
 
     /**

@@ -236,9 +236,9 @@ public class MulticastClient implements Runnable {
                 ByteArrayInputStream bais = new ByteArrayInputStream(recibidos.getData());
                 ObjectInputStream ois = new ObjectInputStream(bais);
                 listaServidores = (LinkedHashMap<Integer, String>) ois.readObject();
-
+                return aux;
             }
-            return aux;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -255,8 +255,6 @@ public class MulticastClient implements Runnable {
             System.out.println(respuesta);
             if (respuesta.equals("actualizar")) {
                 actualizarLista();
-            }else if(respuesta.equals("-1")){
-                flag = true;
             }
         }
     }

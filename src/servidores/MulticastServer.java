@@ -91,11 +91,7 @@ public class MulticastServer implements Runnable {
                         enviados = new DatagramPacket(lst, lst.length, gpo, 9999);
                         s.send(enviados);
 
-                    } else {
-                        String error = "-1";
-                        enviados = new DatagramPacket(error.getBytes(), error.length(), gpo, 9999);
-                        s.send(enviados);
-                    }
+                    } 
 
                 }
 

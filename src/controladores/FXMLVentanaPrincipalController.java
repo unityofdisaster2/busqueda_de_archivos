@@ -78,7 +78,7 @@ public class FXMLVentanaPrincipalController implements Initializable {
         } else {
             Alert b;
             //se cambia bandera del servidor para indicar que a este no se le debe preguntar por el archivo
-            nodo.getDs().switchFlag();
+            nodo.getDs().turnOnFlag();
             String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
             System.out.println("respuesta del servidor" + respuesta);
             if (respuesta.equals("-1")) {
@@ -98,6 +98,7 @@ public class FXMLVentanaPrincipalController implements Initializable {
                 b.showAndWait();
                 clearProgress();
             }
+            nodo.getDs().turnOffFlag();
         }
     }
     
