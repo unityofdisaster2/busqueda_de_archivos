@@ -7,6 +7,7 @@ package controladores;
 
 import pnodo.Nodo;
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -82,9 +83,9 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                     //se ejecuta hilo de cliente multicast
                     nodo.iniciarClienteMulticast();
                     //se envia puerto al servidor multicast
-                    nodo.getMc().enviarPuerto(puerto.getText(), (InetAddress.getLocalHost().getHostAddress()).trim());
+                    nodo.getMc().enviarPuerto(puerto.getText(), getIpAddress());
                     //se establece direccion ip local
-                    nodo.setDireccionIP((InetAddress.getLocalHost().getHostAddress()).trim());
+                    nodo.setDireccionIP(getIpAddress());
                     //se liga controlador con nodo
                     controller.setNodo(nodo);
                     //se inicializa servidor de datagrama y servidor de flujo
@@ -126,6 +127,21 @@ public class FXMLVentanaBienvenidaController implements Initializable {
 
         }
 
+    }
+    
+    public String getIpAddress(){
+        String respuesta = "";
+        try {
+
+            DatagramSocket socket = new DatagramSocket();
+            System.out.println(socket.getLocalAddress());
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            System.out.println(socket.getLocalAddress().getHostAddress());
+            respuesta = socket.getLocalAddress().getHostAddress();
+            socket.close();
+            return respuesta;
+        } catch (Exception e) {}
+        return respuesta;
     }
 
     @Override
