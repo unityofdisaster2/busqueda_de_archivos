@@ -9,14 +9,18 @@ import pnodo.Nodo;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
@@ -48,13 +52,14 @@ public class FXMLVentanaPrincipalController implements Initializable {
     private LinkedList<String> listaMensajes;
     private ObservableList<String> elementosServidores;
     private Nodo nodo;
-    
+
     //controla el estado de las barras de progresoo
     public void controlProgress(double valor) {
         progreso.setProgress(valor);
         indProgreso.setProgress(valor);
+
     }
-    
+
     //reestablece las barras de progreso al valor inicial
     public void clearProgress() {
         progreso.setProgress(0.0);
@@ -101,25 +106,27 @@ public class FXMLVentanaPrincipalController implements Initializable {
             nodo.getDs().turnOffFlag();
         }
     }
-    
+
     /**
      * Metodo para actualizar los valores desplegados en la lista de servidores
-     * @param lista 
+     *
+     * @param lista
      */
     @FXML
     public void actualizarLista(LinkedList<String> lista) {
-        servidores.getItems().clear();
-        servidores.refresh();
-        elementosServidores = FXCollections.observableList(lista);
-        try {
-            servidores.setItems(elementosServidores);
-        } catch (Exception e) {
-        }
-        servidores.refresh();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                elementosServidores = FXCollections.observableList(lista);
+                servidores.setItems(elementosServidores);
+                servidores.refresh();
+
+            }
+
+        });
 
     }
-    
-    
+
     /**
      * Metodo para iniciar ejecucion de clientes y servidores
      */
@@ -129,11 +136,12 @@ public class FXMLVentanaPrincipalController implements Initializable {
         nodo.conectarClienteDatagrama();
         nodo.iniciarHilosServidores();
     }
-    
+
     /**
      * Metodo para agregar mensajes desplegados por las distintas acciones
      * realizadas por el programa
-     * @param mensaje 
+     *
+     * @param mensaje
      */
     @FXML
     public void addMensaje(String mensaje) {
@@ -145,27 +153,41 @@ public class FXMLVentanaPrincipalController implements Initializable {
             if (!msjs.equals("")) {
                 cadenaMensajes += "(" + Integer.toString(contador) + ") " + msjs + "\n";
                 contador++;
-            }else{
+            } else {
                 cadenaMensajes += msjs + "\n";
             }
 
         }
         mensajes.setText(cadenaMensajes);
     }
-    
+
     /**
      * Funcion que funciona como constructor de la interfaz grafica
+     *
      * @param url
-     * @param rb 
+     * @param rb
      */
     @Override
     @FXML
     public void initialize(URL url, ResourceBundle rb) {
         nombreArchivo.setPromptText("e.g. archivo.pdf");
         listaMensajes = new LinkedList<>();
-
         mensajes.setEditable(false);
-
+        /*
+        Thread t1 = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    try {
+                        controlProgress((double) i / 100);
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(FXMLVentanaPrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        t1.start();
+        */
     }
 
 }

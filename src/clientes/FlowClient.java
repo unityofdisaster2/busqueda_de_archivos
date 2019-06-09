@@ -116,7 +116,7 @@ public class FlowClient {
                 recibidos = recibidos + n;
                 porcentaje = (int) (recibidos * 100 / tamano);
                 //-------------------------------------------------------------
-                controlador.controlProgress((double)porcentaje);
+                controlador.controlProgress((double)porcentaje/100);
                 //-------------------------------------------------------------
                 System.out.print("Recibido: " + porcentaje + "%\n");
             }
