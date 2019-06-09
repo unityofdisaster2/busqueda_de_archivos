@@ -205,7 +205,7 @@ public class MulticastClient implements Runnable {
                         copiaMapa.putAll(listaServidores);
                         for (String llaves : copiaMapa.keySet()) {
                             //se muestran los elementos de la lista en pantalla
-                            System.out.println(llaves + " " + listaServidores.get(llaves));
+                            //System.out.println(llaves + " " + listaServidores.get(llaves));
                             //si uno de los contadores llega a cero se elimina su id ligado
                             if (copiaMapa.get(llaves) == 0) {
                                 listaServidores.remove(llaves);
@@ -257,7 +257,7 @@ public class MulticastClient implements Runnable {
                 cl.receive(p);
 
                 String msj = new String(p.getData(), 0, p.getLength());
-                System.out.println("Datagrama recibido: " + msj + " desde:" + p.getAddress().getHostAddress());
+                //System.out.println("Datagrama recibido: " + msj + " desde:" + p.getAddress().getHostAddress());
                 String llave = p.getAddress().getHostAddress() + ":" + msj;
                 //cuando se reciba un paquete de algun servidor se inicia o reinicia su contador en 11
                 listaServidores.put(llave, 11);

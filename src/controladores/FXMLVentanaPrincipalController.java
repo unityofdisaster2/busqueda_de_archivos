@@ -7,6 +7,7 @@ package controladores;
 
 import pnodo.Nodo;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -86,21 +87,31 @@ public class FXMLVentanaPrincipalController implements Initializable {
             Alert b;
             //se cambia bandera del servidor para indicar que a este no se le debe preguntar por el archivo
             nodo.getDs().turnOnFlag();
-            String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
+            //String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
+            LinkedHashMap<String,LinkedList<String>> respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText(),new LinkedHashMap<String,LinkedList<String>>());
+            
             System.out.println("respuesta del servidor" + respuesta);
-            if (respuesta.equals("-1")) {
+            if (respuesta.isEmpty()) {
                 b = new Alert(Alert.AlertType.INFORMATION, "No se ha encontrado el archivo");
                 b.showAndWait();
 
             } else if (!respuesta.equals("")) {
-                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado en: " + respuesta + " presione aceptar para comenzar descarga");
+                //b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado en: " + respuesta + " presione aceptar para comenzar descarga");
+                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado " +  " presione aceptar para comenzar descarga");
                 b.showAndWait();
+        
+                for(String claves: respuesta.keySet()){
+                    System.out.println("clave hash: "+claves);
+                    for(String hosts: respuesta.get(claves)){
+                        System.out.println("host asociado: "+hosts);
+                    }
+                }                
                 //se inicializan valores del socket de flujo y se conecta
-                nodo.iniciarSocketFlujo(respuesta.substring(0, respuesta.indexOf(":")), Integer.parseInt(respuesta.substring(respuesta.indexOf(":") + 1, respuesta.length())));
+                //nodo.iniciarSocketFlujo(respuesta.substring(0, respuesta.indexOf(":")), Integer.parseInt(respuesta.substring(respuesta.indexOf(":") + 1, respuesta.length())));
                 //se hace la peticion por el archivo solicitado
-                nodo.peticionSocketFlujo(nombreArchivo.getText());
+                //nodo.peticionSocketFlujo(nombreArchivo.getText());
                 //dado que pueden cambiar los valores en un futuro se cierra socket de flujo
-                nodo.desconectarSocketFlujo();
+                //nodo.desconectarSocketFlujo();
                 b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo descargado");
                 b.showAndWait();
                 clearProgress();

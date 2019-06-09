@@ -53,7 +53,7 @@ public class Nodo {
     }
     
     public void setPuertoSiguiente(int puertoSiguiente){
-        System.out.println("siguiente: "+puertoSiguiente);
+        //System.out.println("siguiente: "+puertoSiguiente);
         this.puertoSiguiente = puertoSiguiente;
     }
     
@@ -62,7 +62,7 @@ public class Nodo {
     }
 
     public void setPuertoAnterior(int puertoAnterior){
-        System.out.println("anterior: "+puertoAnterior);
+        //System.out.println("anterior: "+puertoAnterior);
         this.puertoAnterior = puertoAnterior;
     }
     

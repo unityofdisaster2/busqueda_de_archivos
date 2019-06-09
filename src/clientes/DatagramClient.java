@@ -6,12 +6,18 @@
 package clientes;
 
 import controladores.FXMLVentanaPrincipalController;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidores.DatagramServer;
@@ -159,5 +165,66 @@ public class DatagramClient {
             ex.printStackTrace();
         }
         return "";
+    }
+    
+    
+    
+    
+    public LinkedHashMap<String,LinkedList<String>> preguntarArchivo(String filename, LinkedHashMap<String,LinkedList<String>> mapaLocal){
+        try {
+            //strBytes = filename.getBytes();
+
+            //primero se envia host del cliente que consulta
+            envios = new DatagramPacket(hostLocal.getBytes(),hostLocal.length(),hostSiguiente,ptoSiguiente);
+            cl.send(envios);
+            
+            //se despliega mensaje en interfaz grafica donde se notifica que se comenzo la busqueda
+            
+            System.out.println("se pregunta por existencia");
+            
+            
+            //controlador.addMensaje("se pregunta por existencia de archivo "+filename+" a: "+hostSiguiente+":"+Integer.toString(ptoSiguiente));
+            //posteriormente se envia nombre del archivo
+            envios = new DatagramPacket(filename.getBytes(),filename.length(),hostSiguiente,ptoSiguiente);
+            cl.send(envios);
+            
+            //**********   envio de estructura de datos ******************************
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(mapaLocal);
+            byte [] lst = baos.toByteArray();
+            
+            envios = new DatagramPacket(lst,lst.length,hostSiguiente,ptoSiguiente);
+            cl.send(envios);
+            //**********   envio de estructura de datos ******************************
+            
+            //************ recepcion de estructura de datos **************************
+            recepciones = new DatagramPacket(new byte[1024*4],1024*4);
+            //se recibe respuesta del servidor
+            System.out.println("se queda esperandooooooooooooooooooo");
+            cl.receive(recepciones);
+            
+            //se recibe un arreglo de bytes que corresponde a un LinkedHashMap
+            ByteArrayInputStream bais = new ByteArrayInputStream(recepciones.getData());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            LinkedHashMap<String,LinkedList<String>> mapaAux = new LinkedHashMap<>();
+            try{
+                mapaAux = (LinkedHashMap<String,LinkedList<String>>)ois.readObject();
+            }catch(Exception e){e.printStackTrace();}
+            
+            
+            //************ recepcion de estructura de datos **************************
+            
+            if(mapaAux.size() == 0){
+                System.out.println("do something");
+                //controlador.addMensaje("archivo no encontrado");
+            }
+            return mapaAux;
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }    
+     
 }
