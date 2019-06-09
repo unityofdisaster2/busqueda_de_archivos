@@ -55,8 +55,5 @@ public class FlowServer implements Runnable{
 
 
 
-    public static void main(String[] args) {
-        Thread t = new Thread(new FlowServer(9998));
-        t.start();
-    }
+
 }

@@ -3,13 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/controladores/FXMLVentanaPrincipalController.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/servidores/MulticastServer.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/clientes/DatagramClient.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/pnodo/Nodo.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/main/ClasePrincipal.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/servidores/DatagramServer.java</file>
-            <file>file:/home/unityofdisaster/Desktop/busqueda_de_archivos/src/clientes/MulticastClient.java</file>
+            <file>file:/home/unityofdisaster/Desktop/repositorio/busqueda_de_archivos/src/controladores/vistaDescargas.java</file>
+            <file>file:/home/unityofdisaster/Desktop/repositorio/busqueda_de_archivos/src/main/ClasePrincipal.java</file>
+            <file>file:/home/unityofdisaster/Desktop/repositorio/busqueda_de_archivos/src/clientes/DatagramClient.java</file>
         </group>
     </open-files>
 </project-private>

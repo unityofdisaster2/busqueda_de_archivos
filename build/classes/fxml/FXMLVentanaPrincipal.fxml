@@ -64,8 +64,8 @@
                   </GridPane>
                </children>
             </HBox>
-            <Label fx:id="lblSiguiente" prefHeight="17.0" prefWidth="136.0" />
-            <Label fx:id="lblAnterior" prefHeight="17.0" prefWidth="138.0" />
+            <Label fx:id="lblSiguiente" prefHeight="17.0" prefWidth="203.0" />
+            <Label fx:id="lblAnterior" prefHeight="17.0" prefWidth="205.0" />
          </children>
       </VBox>
    </children>

@@ -180,10 +180,10 @@ public class DatagramClient {
             
             //se despliega mensaje en interfaz grafica donde se notifica que se comenzo la busqueda
             
-            System.out.println("se pregunta por existencia");
+            controlador.addMensaje("se pregunta por existencia de archivo "+filename+" a: "+hostSiguiente+":"+Integer.toString(ptoSiguiente));
             
             
-            //controlador.addMensaje("se pregunta por existencia de archivo "+filename+" a: "+hostSiguiente+":"+Integer.toString(ptoSiguiente));
+            
             //posteriormente se envia nombre del archivo
             envios = new DatagramPacket(filename.getBytes(),filename.length(),hostSiguiente,ptoSiguiente);
             cl.send(envios);
@@ -201,7 +201,7 @@ public class DatagramClient {
             //************ recepcion de estructura de datos **************************
             recepciones = new DatagramPacket(new byte[1024*4],1024*4);
             //se recibe respuesta del servidor
-            System.out.println("se queda esperandooooooooooooooooooo");
+
             cl.receive(recepciones);
             
             //se recibe un arreglo de bytes que corresponde a un LinkedHashMap
@@ -217,7 +217,6 @@ public class DatagramClient {
             
             if(mapaAux.size() == 0){
                 System.out.println("do something");
-                //controlador.addMensaje("archivo no encontrado");
             }
             return mapaAux;
             

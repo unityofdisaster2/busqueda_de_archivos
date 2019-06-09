@@ -90,31 +90,21 @@ public class FXMLVentanaPrincipalController implements Initializable {
             //String respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText());
             LinkedHashMap<String,LinkedList<String>> respuesta = nodo.getDc().preguntarArchivo(nombreArchivo.getText(),new LinkedHashMap<String,LinkedList<String>>());
             
-            System.out.println("respuesta del servidor" + respuesta);
+
             if (respuesta.isEmpty()) {
                 b = new Alert(Alert.AlertType.INFORMATION, "No se ha encontrado el archivo");
+                addMensaje("archivo no encontrado en ningun nodo");
                 b.showAndWait();
 
             } else if (!respuesta.equals("")) {
                 //b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado en: " + respuesta + " presione aceptar para comenzar descarga");
-                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado " +  " presione aceptar para comenzar descarga");
+                addMensaje("archivo encontrado");
+                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo encontrado ");
                 b.showAndWait();
-        
-                for(String claves: respuesta.keySet()){
-                    System.out.println("clave hash: "+claves);
-                    for(String hosts: respuesta.get(claves)){
-                        System.out.println("host asociado: "+hosts);
-                    }
-                }                
-                //se inicializan valores del socket de flujo y se conecta
-                //nodo.iniciarSocketFlujo(respuesta.substring(0, respuesta.indexOf(":")), Integer.parseInt(respuesta.substring(respuesta.indexOf(":") + 1, respuesta.length())));
-                //se hace la peticion por el archivo solicitado
-                //nodo.peticionSocketFlujo(nombreArchivo.getText());
-                //dado que pueden cambiar los valores en un futuro se cierra socket de flujo
-                //nodo.desconectarSocketFlujo();
-                b = new Alert(Alert.AlertType.CONFIRMATION, "Archivo descargado");
-                b.showAndWait();
-                clearProgress();
+
+                new vistaDescargas(nodo, respuesta,nombreArchivo.getText()).setVisible(true);
+                
+
             }
             nodo.getDs().turnOffFlag();
         }

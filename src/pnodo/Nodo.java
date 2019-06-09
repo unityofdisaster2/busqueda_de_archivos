@@ -6,13 +6,15 @@
 package pnodo;
 
 import clientes.DatagramClient;
+import clientes.FileClient;
 import clientes.FlowClient;
 import clientes.MulticastClient;
 import servidores.MulticastServer;
 import controladores.FXMLVentanaPrincipalController;
 import servidores.DatagramServer;
-import servidores.FlowServer;
+//import servidores.FlowServer;
 
+import servidores.FileServer;
 /**
  *
  * @author sandu
@@ -22,8 +24,10 @@ public class Nodo {
 
     private MulticastClient mc;
     private MulticastServer ms;
-    private FlowClient fc;
-    private FlowServer fs;
+    //private FlowClient fc;
+    private FileClient fc;
+    //private FlowServer fs;
+    private FileServer fs;
     private DatagramClient dc;
     private DatagramServer ds;
     private int globalPort,puertoSiguiente,puertoAnterior;
@@ -46,6 +50,10 @@ public class Nodo {
     
     public void setDireccionIP(String direccionIP){
         this.direccionIP = direccionIP;
+    }
+    
+    public String getDireccionIP(){
+        return this.direccionIP;
     }
     
     public int getGlobalPort(){
@@ -101,7 +109,7 @@ public class Nodo {
     /**
      * @return the fc
      */
-    public FlowClient getFc() {
+    public FileClient getFc() {
         return fc;
     }
 
@@ -147,31 +155,36 @@ public class Nodo {
         getDc().setControlador(controlador);
         
     }
-    /**
-     * Metodo para inicializar valores importantes de cliente de flujo
-     * y realizar la conexion
-     * @param direccionFlujo
-     * @param puertoFlujo 
-     */
+    
+    /*
     public void iniciarSocketFlujo(String direccionFlujo, int puertoFlujo){
         fc = new FlowClient(direccionFlujo, puertoFlujo, Integer.toString(globalPort));
         fc.setControlador(controlador);
         fc.conectar();
         
+    }*/
+    
+    public void iniciarClienteArchivos(String host,int puerto){
+        System.out.println("puertoooooo"+puerto);
+        System.out.println("foldeeeeeerr"+globalPort);
+        fc = new FileClient(host, puerto, Integer.toString(globalPort));
+        fc.conectar();
     }
     
-    
+    /*
     public void desconectarSocketFlujo(){
         getFc().desconectar();
-    }
+    }*/
     
     /**
      * Funcion para realizar la peticion de descarga de un archivo
      * @param filename se recibe como argumento nombre de archivo con su extension
      */
+    /*
+    
     public void peticionSocketFlujo(String filename){
         fc.descargarArchivo(filename);
-    }
+    }*/
     
     
     /**
@@ -185,7 +198,7 @@ public class Nodo {
         ds.setDc(dc);
         dc.setDs(ds);
         dc.setHostLocal(direccionIP);
-        fs = new FlowServer(this.globalPort+100);
+        fs = new FileServer(this.globalPort+100);
     }
     
     /**

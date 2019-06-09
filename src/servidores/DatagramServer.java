@@ -223,7 +223,7 @@ public class DatagramServer implements Runnable {
                     
                     if (f.exists()) {
                         //si se encuentra el archivo se despliega mensaje en ventana
-                        //control.addMensaje("archivo "+archivo+ " encontrado, se notifica a cliente que solicita");
+                        control.addMensaje("archivo "+archivo+ " encontrado, se verifica siguiente nodo");
                         //String confirmacion = hostLocal + ":" + Integer.toString(ptoLocal + 100);
                         MD5CheckSum md5 = new MD5CheckSum();
                         String llaveMD5 = md5.getMD5Checksum(Integer.toString(ptoLocal) + "/" + archivo);
@@ -231,12 +231,14 @@ public class DatagramServer implements Runnable {
 
                     } else {
                         //si el archivo no existe se despliega mensaje notificandolo
-                        System.out.println("archivo no encontrado en este nodo");
-                        //control.addMensaje("archivo "+ archivo+" no encontrado en este nodo");
+                        control.addMensaje("archivo "+ archivo+" no encontrado en este nodo, se verifica siguiente");
                         //se utiliza cliente ligado para preguntar al siguiente nodo si cuenta con el archivo
                     }
-                        mapaEx = dc.preguntarArchivo(archivo,mapaEx);
 
+                        mapaEx = dc.preguntarArchivo(archivo,mapaEx);
+                        
+
+                        
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ObjectOutputStream oos = new ObjectOutputStream(baos);
                         oos.writeObject(mapaEx);
@@ -251,8 +253,9 @@ public class DatagramServer implements Runnable {
                     //si se llega a esta condicion quiere decir que se le esta pregunta al mismo nodo que hizo la pregunta del archivo
                     //por lo tanto este nodo unicamente regresara el mensaje de error -1
                     System.out.println("se llega a nodo de origen");
-                    
+                    control.addMensaje("busqueda llega a nodo origen");
                     if(f.exists()){
+                        control.addMensaje("archivo ya existe aqui");
                         MD5CheckSum md5 = new MD5CheckSum();
                         String llaveMD5 = md5.getMD5Checksum(Integer.toString(ptoLocal) + "/" + archivo);
                         agregarReferenciaLocal(mapaEx, hostLocal + ":" + Integer.toString(ptoLocal + 100), llaveMD5);                        
@@ -281,73 +284,5 @@ public class DatagramServer implements Runnable {
     }
     
     
-    /*
-    @Override
-    public void run() {
-        try {
-            //se establece conexion de socket de datagramas
-            s = new DatagramSocket(ptoLocal, InetAddress.getByName(hostLocal));
-
-            String mensaje, archivo, hostConsulta;
-            for (;;) {
-                System.out.println("estado de la bandera:"+flag);
-                
-                
-                //se recibe el host del cliente que consulta
-                recepciones = new DatagramPacket(new byte[100], 100);
-                s.receive(recepciones);
-
-                hostConsulta = new String(recepciones.getData(), 0, recepciones.getLength());
-
-                s.receive(recepciones);
-                
-                //se recibe el nombre del archivo consultado
-                archivo = new String(recepciones.getData(), 0, recepciones.getLength());    
-                
-                //si la bandera no se levanto quiere decir que este nodo es uno distinto al que pregunto inicialmente
-                //y se puede realizar la busqueda
-                if (flag == false) {
-                    System.out.println(recepciones.getPort()+":"+recepciones.getAddress().getHostAddress());
-                    //se despliega en cuadro de mensajes que la consulta paso por este nodo
-                    control.addMensaje("se recibe peticion de busqueda de archivo: " + archivo);
-                    File f = new File(Integer.toString(ptoLocal) + "/" + archivo);
-                    if (f.exists()) {
-                        //si se encuentra el archivo se despliega mensaje en ventana
-                        control.addMensaje("archivo "+archivo+ " encontrado, se notifica a cliente que solicita");
-                        String confirmacion = hostLocal+":"+Integer.toString(ptoLocal + 100);
-                        //se envia de vuelta mensaje de confirmacion que esta compuesto por el host y el puerto de flujo del nodo que lo encontro
-                        envios = new DatagramPacket(confirmacion.getBytes(), confirmacion.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
-                        s.send(envios);
-                    } else {
-                        //si el archivo no existe se despliega mensaje notificandolo
-                        control.addMensaje("archivo "+ archivo+" no encontrado en este nodo");
-                        //se utiliza cliente ligado para preguntar al siguiente nodo si cuenta con el archivo
-                        mensaje = dc.preguntarArchivo(archivo);
-                        //se envia de vuelta al nodo anterior la respuesta que se haya obtenido del nodo siguiente
-                        envios = new DatagramPacket(mensaje.getBytes(), mensaje.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
-                        //se envia de vuelta
-                        s.send(envios);
-                    }
-
-                }else{
-                    //si se llega a esta condicion quiere decir que se le esta pregunta al mismo nodo que hizo la pregunta del archivo
-                    //por lo tanto este nodo unicamente regresara el mensaje de error -1
-                    System.out.println("se llega a nodoo de origen");
-                    
-                    System.out.println(recepciones.getPort()+":"+recepciones.getAddress().getHostAddress());
-                    mensaje = "-1";
-                    //se despliega en el nodo origen que no se encontro archivo en ningun nodo
-                    control.addMensaje("no se encontro archivo en ningun nodo");
-                    envios = new DatagramPacket(mensaje.getBytes(), mensaje.length(), InetAddress.getByName(hostConsulta), recepciones.getPort());
-                    s.send(envios);
-                    flag = false;
-                    
-                }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 
 }
