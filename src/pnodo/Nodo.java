@@ -8,6 +8,7 @@ package pnodo;
 import clientes.DatagramClient;
 import clientes.FlowClient;
 import clientes.MulticastClient;
+import servidores.MulticastServer;
 import controladores.FXMLVentanaPrincipalController;
 import servidores.DatagramServer;
 import servidores.FlowServer;
@@ -20,6 +21,7 @@ public class Nodo {
 
 
     private MulticastClient mc;
+    private MulticastServer ms;
     private FlowClient fc;
     private FlowServer fs;
     private DatagramClient dc;
@@ -91,6 +93,10 @@ public class Nodo {
     public MulticastClient getMc() {
         return mc;
     }
+    
+    public MulticastServer getMs(){
+        return ms;
+    }
 
     /**
      * @return the fc
@@ -115,25 +121,19 @@ public class Nodo {
     }
     
     
-    
-    /*
-    public void setNodoSiguiente(Nodo siguiente){
-        this.siguiente = siguiente;
-    }
-    
-    public Nodo getNodoSiguiente(Nodo siguiente){
-        return this.siguiente;
-    }*/
+
     
     /**
      * Metodo para unicamente inicializar valores importantes del cliente
      * multicast
      */
-    public void inicializarClienteMulticast(){
+    public void inicializarMulticast(){
         mc = new MulticastClient();
+        ms = new MulticastServer(this.globalPort);
         getMc().setControlador(controlador);
     }
     
+
     
     /**
      * Metodo para unicamente inicializar valores importantes del cliente
@@ -191,11 +191,14 @@ public class Nodo {
     /**
      * Metodo para ejecutar el hilo correspondiente al cliente multicast
      */
-    public void iniciarClienteMulticast(){
-        getMc().conectar();
+    public void conectarMulticast(){
         Thread s1 = new Thread(getMc());
         s1.start();
+        Thread s2 = new Thread(getMs());
+        s2.start();
     }
+    
+
     
     
     /**

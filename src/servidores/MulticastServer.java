@@ -5,143 +5,70 @@
  */
 package servidores;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.net.*;
+//import javax.swing.JOptionPane;
 
 /**
  *
  * @author sandu
  */
 public class MulticastServer implements Runnable {
-
+    
+    
+    /*
+    //probar servidor con hilo
+    public static void main(String[] args) {
+        
+        String pto = JOptionPane.showInputDialog(null, "ingrese un numero de puerto", "numero puerto");
+        MulticastServer ms = new MulticastServer(Integer.parseInt(pto));
+        Thread t1 = new Thread(ms);
+        t1.start();
+    }*/    
+    
     private MulticastSocket s;
-    private DatagramPacket recibidos, enviados;
-    private String ptoServicio;
-    private byte[] b;
-    private InetAddress gpo;
-    private LinkedHashMap<Integer, String> puertoServicio;
-    String peticion;
-    int ptoRecibido;
-    String hostRecibido;
-
-    public MulticastServer() {
-        gpo = null;
-        puertoServicio = new LinkedHashMap<>();
+    private int puertoServicio;
+    
+    
+   
+    public void setPuertoServicio(int puertoServicio){
+        this.puertoServicio = puertoServicio;
+    }
+    
+    /**
+     * Constructor necesita el puerto de servicio del servidor de datagramas local
+     * @param puertoServicio 
+     */
+    public MulticastServer(int puertoServicio){
+        this.puertoServicio = puertoServicio;
     }
 
     @Override
     public void run() {
+        InetAddress gpo = null;
         try {
-            this.s = new MulticastSocket(9876);
-            System.out.println("servidor multicast iniciado");
+            //conectar 
+            MulticastSocket s = new MulticastSocket(9876);
             s.setReuseAddress(true);
             s.setTimeToLive(1);
+            //se enviara como mensaje el puerto de datagramas en forma de cadena
+            String msj = Integer.toString(puertoServicio);
+            byte[] b = msj.getBytes();
             gpo = InetAddress.getByName("228.1.1.1");
             s.joinGroup(gpo);
-            for (;;) {
-                //primero se recibe peticion
-                recibidos = new DatagramPacket(new byte[100], 100);
-                s.receive(recibidos);
-                peticion = new String(recibidos.getData(), 0, recibidos.getLength());
-
-                if (peticion.equals("1")) {
-                    s.receive(recibidos);
-                    //primero se recibe el puerto global de un nodo que se haya levantado
-                    ptoRecibido = Integer.parseInt(new String(recibidos.getData(), 0, recibidos.getLength()));
-                    s.receive(recibidos);
-                    //posteriormente se recibe la direccion IP
-                    hostRecibido = new String(recibidos.getData(), 0, recibidos.getLength());
-                    if (!puertoServicio.containsKey(ptoRecibido)) {
-                        puertoServicio.put(ptoRecibido, hostRecibido);
-
-                        //se manda mensaje para que el cliente se prepare para actualizar la lista de nodos activos
-                        //nota: este paso se podria quitar ya que se diseño el servidor para que en los unicos mensajes
-                        //que maneja se actualice la tabla
-                        String aux = "actualizar";
-                        enviados = new DatagramPacket(aux.getBytes(), aux.length(), gpo, 9999);
-                        s.send(enviados);
-
-                        int[] auxArr = new int[puertoServicio.size()];
-                        int index = 0;
-                        //se guardan los nodos por orden de aparicion en un arreglo auxiliar
-                        for (int llaves : puertoServicio.keySet()) {
-                            auxArr[index] = llaves;
-                            index++;
-                        }
-                        //se ordenan puertos en forma ascendente
-                        Arrays.sort(auxArr);
-
-                        LinkedHashMap<Integer, String> res = new LinkedHashMap<>();
-                        //se guardan nodos y su host asociados en una nueva estructura
-                        for (int i = 0; i < auxArr.length; i++) {
-                            res.put(auxArr[i], puertoServicio.get(auxArr[i]));
-                        }
-
-                        //se convierte estructura en arreglo de bytes para ser enviado como datagrama
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ObjectOutputStream oos = new ObjectOutputStream(baos);
-                        oos.writeObject(res);
-                        byte[] lst = baos.toByteArray();
-                        // se envia estructura al grupo que este conectado al puerto 9999
-                        enviados = new DatagramPacket(lst, lst.length, gpo, 9999);
-                        s.send(enviados);
-
-                    } 
-
+            for(;;){
+                
+                DatagramPacket p = new DatagramPacket(b,b.length, gpo,9999);
+                s.send(p);
+                try {
+                    Thread.sleep(5000);//espera 5 segundos para volver a enviar el paquete
+                } catch (InterruptedException io) {
+                    io.printStackTrace();
                 }
-
-                if (peticion.equals("3")) {
-                    s.receive(recibidos);
-
-                    String pReceived = new String(recibidos.getData(), 0, recibidos.getLength());
-                    System.out.println("Tamano de HashMap: " + puertoServicio.size());
-                    //se retira puerto recibido de la lista y se manda orden para actualizar la lista e interfaz en los clientes
-                    puertoServicio.remove(Integer.parseInt(pReceived));
-
-                    System.out.println("Tamano de HashMap: " + puertoServicio.size());
-                    String aux = "actualizar";
-                    enviados = new DatagramPacket(aux.getBytes(), aux.length(), gpo, 9999);
-                    s.send(enviados);
-                    //se repite el proceso de ordenamiento (se podria hacer en una sola funcion para no repetir codigo
-                    int[] auxArr = new int[puertoServicio.size()];
-                    int index = 0;
-                    for (int llaves : puertoServicio.keySet()) {
-                        auxArr[index] = llaves;
-                        index++;
-                    }
-
-                    Arrays.sort(auxArr);
-
-                    LinkedHashMap<Integer, String> res = new LinkedHashMap<>();
-                    for (int i = 0; i < auxArr.length; i++) {
-                        res.put(auxArr[i], puertoServicio.get(auxArr[i]));
-                    }
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
-                    oos.writeObject(res);
-                    byte[] lst = baos.toByteArray();
-                    enviados = new DatagramPacket(lst, lst.length, gpo, 9999);
-                    s.send(enviados);
-
-                }
-
-                Thread.sleep(5000);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        MulticastServer ms = new MulticastServer();
-        Thread t1 = new Thread(ms);
-        t1.start();
+        
     }
 
 }

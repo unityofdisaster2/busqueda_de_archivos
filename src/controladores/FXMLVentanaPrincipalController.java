@@ -119,8 +119,8 @@ public class FXMLVentanaPrincipalController implements Initializable {
                 lblSiguiente.setText("");
                 
             }else{
-                lblAnterior.setText("nodo anterior:"+ant);
-                lblSiguiente.setText("nodo siguiente"+sig);
+                lblAnterior.setText("nodo anterior: "+ant);
+                lblSiguiente.setText("nodo siguiente: "+sig);
             }
         });
     }
@@ -186,21 +186,7 @@ public class FXMLVentanaPrincipalController implements Initializable {
         nombreArchivo.setPromptText("e.g. archivo.pdf");
         listaMensajes = new LinkedList<>();
         mensajes.setEditable(false);
-        /*
-        Thread t1 = new Thread(new Runnable() {
-            public void run() {
-                for (int i = 0; i < 100; i++) {
-                    try {
-                        controlProgress((double) i / 100);
-                        Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FXMLVentanaPrincipalController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-        t1.start();
-        */
+
     }
 
 }

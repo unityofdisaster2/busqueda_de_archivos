@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -21,105 +23,28 @@ import java.util.LinkedList;
  */
 public class MulticastClient implements Runnable {
 
-    private MulticastSocket cl;
-    private InetAddress gpo;
-    private DatagramPacket recibidos;
-    private DatagramPacket ptoEnviado;
     private LinkedList<String> listaPuertos;
     private FXMLVentanaPrincipalController controlVentana;
-    private LinkedHashMap<Integer, String> listaServidores;
-    private boolean flag = false;
+    private LinkedHashMap<String, Boolean> estadoServidores;
+    private LinkedHashMap<String, Integer> listaServidores;
+    private LinkedHashMap<Integer, String> ordenPuertos;
+    private int cantidad_servidores_actual;
+    private int cantidad_servidores_anterior;
+    private int contador_prueba;
+    
     //se pasa el controlador de los eventos de la ventana 
     public MulticastClient() {
-
+        estadoServidores = new LinkedHashMap<>();
+        listaServidores = new LinkedHashMap<>();
+        ordenPuertos = new LinkedHashMap<>();
+        cantidad_servidores_actual = 0;
+        cantidad_servidores_anterior = 0;
+        contador_prueba = 0;
     }
 
     //se guarda controlador de ventana para actualizar los cambios en la lista de usuarios
     public void setControlador(FXMLVentanaPrincipalController controlVentana) {
         this.controlVentana = controlVentana;
-    }
-
-    byte[] b;
-
-    public boolean conectar() {
-        try {
-            // 9999 el puerto que escucharan todos los clientes
-            cl = new MulticastSocket(9999);
-            cl.setReuseAddress(true);
-            cl.setTimeToLive(1);
-            gpo = InetAddress.getByName("228.1.1.1");
-            cl.joinGroup(gpo);
-            System.out.println("Cliente multicast conectado...");
-            return true;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean desconectar() {
-        try {
-            cl.leaveGroup(gpo);
-            cl.disconnect();
-            cl.close();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * Metodo para enviar puerto y host al servidor y este sea agregado a la
-     * lista de nodos activos
-     *
-     * @param puertoServicio puerto ligado al nodo iniciado
-     * @param host direccion ip del nodo iniciado
-     */
-    public void enviarPuerto(String puertoServicio, String host) {
-        b = puertoServicio.getBytes();
-        try {
-
-            //se envia la peticion para que se agregue un nuevo nodo
-            String peticion = "1";
-            ptoEnviado = new DatagramPacket(peticion.getBytes(), peticion.length(), gpo, 9876);
-            cl.send(ptoEnviado);
-            //Se envia puerto
-            ptoEnviado = new DatagramPacket(b, b.length, gpo, 9876);
-            cl.send(ptoEnviado);
-            //se envia direccion ip
-            byte[] ip = host.getBytes();
-            ptoEnviado = new DatagramPacket(ip, ip.length, gpo, 9876);
-            cl.send(ptoEnviado);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Metodo encargado de mandar la peticion para eliminar el puerto de este
-     * nodo al servidor multicast. (Este metodo debe ser invocado cuando se
-     * cierre la ventana de la interfaz grafica)
-     *
-     * @param puertoServicio
-     */
-    public void eliminarPuerto(String puertoServicio) {
-        b = puertoServicio.getBytes();
-        try {
-            String peticion = "3";
-            //se envia peticion para remover puerto
-            ptoEnviado = new DatagramPacket(peticion.getBytes(), peticion.length(), gpo, 9876);
-            cl.send(ptoEnviado);
-            //se envia puerto que se desea eliminar
-            ptoEnviado = new DatagramPacket(b, b.length, gpo, 9876);
-            cl.send(ptoEnviado);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     public void actualizarPuertos() {
@@ -128,10 +53,10 @@ public class MulticastClient implements Runnable {
         LinkedList<Integer> ptos = new LinkedList<>();
         LinkedList<String> hosts = new LinkedList<>();
         //se agregan todos los puertos a la lista
-        ptos.addAll(listaServidores.keySet());
+        ptos.addAll(ordenPuertos.keySet());
         //se agregan valores ligados a los puertos a la lista de hosts
         for (Integer numbs : ptos) {
-            hosts.add(listaServidores.get(numbs));
+            hosts.add(ordenPuertos.get(numbs));
         }
 
         int ptSiguiente, ptAnterior, iS, iA;
@@ -177,89 +102,187 @@ public class MulticastClient implements Runnable {
                 hstAnterior = hosts.get(index - 1);
 
             }
-            
+
             controlVentana.actualizarEtiquetas(ptAnterior, ptSiguiente);
-            
+
             //se establece puerto y host siguiente en el nodo
             controlVentana.getNodo().setPuertoSiguiente(ptSiguiente);
             controlVentana.getNodo().setDireccionSiguiente(hstSiguiente);
-            
+
             //se marca en la lista de la interfaz grafica el nodo siguiente
-            String aux = "siguiente:" + listaPuertos.get(iS);
-            listaPuertos.set(iS, aux);
-            
+            //String aux = "siguiente:" + listaPuertos.get(iS);
+            //listaPuertos.set(iS, aux);
+
             //se establece el puerot y host anteriores en el nodo
             controlVentana.getNodo().setPuertoAnterior(ptAnterior);
             controlVentana.getNodo().setDireccionAnterior(hstAnterior);
-            
+
             //se marca puerto anterior en la lista
-            aux = "anterior:" + listaPuertos.get(iA);
-            listaPuertos.set(iA, aux);
+            //aux = "anterior:" + listaPuertos.get(iA);
+            //listaPuertos.set(iA, aux);
             controlVentana.getNodo().actualizarPuertos();
 
-        }else{
+        } else {
             controlVentana.actualizarEtiquetas(0, 0);
         }
 
     }
-    
+
     /**
-     * Metodo para actualizar lista de nodos activos cada que el servidor 
+     * Metodo para actualizar lista de nodos activos cada que el servidor
      * indique el mensaje
      */
     public void actualizarLista() {
         listaPuertos = new LinkedList<>();
-        
+
         //se guardan valores en lista ligada para presentarlos en un formato
         //de la forma: localhost:numero_puerto
-        for (Integer p : listaServidores.keySet()) {
+        for (Integer p : ordenPuertos.keySet()) {
             listaPuertos.add(listaServidores.get(p) + ":" + Integer.toString(p));
             System.out.println(listaServidores.get(p) + ":" + Integer.toString(p));
         }
-        
+
         actualizarPuertos();
         //se actualiza lista en el controlador de la itnerfaz grafica
         controlVentana.actualizarLista(listaPuertos);
     }
-    public boolean getFlag(){
-        return this.flag;
+    
+    
+    public void ordenarPuertos(){
+        int[] auxArr = new int[ordenPuertos.size()];
+        int index = 0;
+        //se guardan los nodos por orden de aparicion en un arreglo auxiliar
+        for (int llaves : ordenPuertos.keySet()) {
+            auxArr[index] = llaves;
+            index++;
+        }
+        //se ordenan puertos en forma ascendente
+        Arrays.sort(auxArr);
+
+        LinkedHashMap<Integer, String> res = new LinkedHashMap<>();
+        //se guardan nodos y su host asociados en una nueva estructura
+        for (int i = 0; i < auxArr.length; i++) {
+            res.put(auxArr[i], ordenPuertos.get(auxArr[i]));
+        }
+        ordenPuertos = res;
     }
     
-    
-    @SuppressWarnings("unchecked")
-    public String recibirMensaje() {
-        recibidos = new DatagramPacket(new byte[5000], 5000);
-        try {
-            cl.receive(recibidos);
-            String aux = new String(recibidos.getData(), 0, recibidos.getLength());
-            //si el nodo que se agrego no es repetido se actualiza lista
-            if (aux.equals("actualizar")) {
-                //se recibe estructura del servidor y se guarda en linkedhashMap
-                cl.receive(recibidos);
-                ByteArrayInputStream bais = new ByteArrayInputStream(recibidos.getData());
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                listaServidores = (LinkedHashMap<Integer, String>) ois.readObject();
-                return aux;
-            }
+    public void actualizarListaInterfaz(){
+        LinkedList<String> listaInterfaz = new LinkedList<>();
+        for(Integer ptos: ordenPuertos.keySet()){
+            listaInterfaz.add(ordenPuertos.get(ptos)+":"+ptos+" "+listaServidores.get(ordenPuertos.get(ptos)+":"+ptos));
+        }
+        actualizarPuertos();
+        controlVentana.actualizarLista(listaInterfaz);
+        //controller.updateTabla(listaInterfaz);
+    }
 
+
+
+    
+
+    @Override
+    public void run() {
+        /*
+        Se crea otro hilo que se encargara de ir actualizando la lista de 
+        servidores en la interfaz grafica 
+         */
+        Runnable checarEstados = new Runnable() {
+            public void run() {
+                boolean flag = true;
+                LinkedHashMap<String, Integer> copiaMapa = new LinkedHashMap<>();
+                for (;;) {
+                    try {
+                        //se recorren los ids de los servidores
+                        for (String llaves : estadoServidores.keySet()) {
+                            //si no ha llegado mensaje de datagrama del servidor
+                            if (!estadoServidores.get(llaves)) {
+                                //se decrementa en uno el contador del servidor
+                                listaServidores.put(llaves, listaServidores.get(llaves) - 1);
+                            }
+                        }
+                        copiaMapa.clear();
+                        copiaMapa.putAll(listaServidores);
+                        for (String llaves : copiaMapa.keySet()) {
+                            //se muestran los elementos de la lista en pantalla
+                            System.out.println(llaves + " " + listaServidores.get(llaves));
+                            //si uno de los contadores llega a cero se elimina su id ligado
+                            if (copiaMapa.get(llaves) == 0) {
+                                listaServidores.remove(llaves);
+                                estadoServidores.remove(llaves);
+                                ordenPuertos.remove(Integer.parseInt(llaves.substring(llaves.indexOf(":") + 1, llaves.length())));
+                                flag = false;
+                            }
+                        }
+                        if (!flag || cantidad_servidores_actual != cantidad_servidores_anterior) {
+                            ordenarPuertos();
+
+                            cantidad_servidores_anterior = cantidad_servidores_actual;
+                            flag = true;
+                        }
+                        actualizarListaInterfaz();
+
+                        //controller.updateTabla();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+            }
+        };
+        Thread t1 = new Thread(checarEstados);
+        t1.start();
+        InetAddress gpo = null;
+        try {
+            MulticastSocket cl = new MulticastSocket(9999);
+            System.out.println("Cliente escuchando puerto: " + cl.getLocalPort());
+            //para poder usar varios clientes debemos hacer que la direccion sea reutilizable
+            cl.setReuseAddress(true);
+
+            try {
+                //nombre o numero del grupo
+                gpo = InetAddress.getByName("228.1.1.1");
+            } catch (UnknownHostException u) {
+                System.err.println("Direccion erronea");
+            }
+            //se une cliente al grupo definido anteriormente
+            cl.joinGroup(gpo);
+            System.out.println("Unido al grupo");
+
+            byte[] b;
+            for (;;) {
+                //en el ciclo se estaran recibiendo mensajes del grupo
+                DatagramPacket p = new DatagramPacket(new byte[10], 10);
+                cl.receive(p);
+
+                String msj = new String(p.getData(), 0, p.getLength());
+                System.out.println("Datagrama recibido: " + msj + " desde:" + p.getAddress().getHostAddress());
+                String llave = p.getAddress().getHostAddress() + ":" + msj;
+                //cuando se reciba un paquete de algun servidor se inicia o reinicia su contador en 11
+                listaServidores.put(llave, 11);
+                //se pone su estado en true para saber que aun esta mandando mensajes el servidor
+                estadoServidores.put(llave, true);
+
+                //Se actualiza la cantidad de servidores
+                cantidad_servidores_actual = estadoServidores.size();
+
+                //se agrega puerto e ip a hashMap
+                ordenPuertos.put(Integer.parseInt(msj), p.getAddress().getHostAddress());
+
+                //se actualizan los estados de los servidores
+                //Se pone en false aquellos que no hayan mandado mensaje recientemente
+                for (String llaves : listaServidores.keySet()) {
+                    if (llaves != llave) {
+                        estadoServidores.put(llaves, false);
+                    }
+                }
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
-    }
-    
-    /**
-     * hilo encargado de recibir peticiones del servidor
-     */
-    @Override
-    public void run() {
-        for (;;) {
-            String respuesta = recibirMensaje();
-            System.out.println(respuesta);
-            if (respuesta.equals("actualizar")) {
-                actualizarLista();
-            }
-        }
+
     }
 
 }

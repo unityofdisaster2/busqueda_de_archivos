@@ -77,15 +77,14 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                     System.out.println(nodo);
                     //se liga el nodo con el controlador
                     nodo.setControlador(controller);
-                    
-                    //se inicializan valores de cliente multicast
-                    nodo.inicializarClienteMulticast();
-                    //se ejecuta hilo de cliente multicast
-                    nodo.iniciarClienteMulticast();
-                    //se envia puerto al servidor multicast
-                    nodo.getMc().enviarPuerto(puerto.getText(), getIpAddress());
                     //se establece direccion ip local
-                    nodo.setDireccionIP(getIpAddress());
+                    nodo.setDireccionIP(getIpAddress());                    
+                    //se inicializan valores de cliente y servidor multicast
+                    nodo.inicializarMulticast();
+                    //se ejecuta hilo de cliente multicast
+                    nodo.conectarMulticast();
+                    //se envia puerto al servidor multicast
+
                     //se liga controlador con nodo
                     controller.setNodo(nodo);
                     //se inicializa servidor de datagrama y servidor de flujo
@@ -107,8 +106,6 @@ public class FXMLVentanaBienvenidaController implements Initializable {
                     //se agrega metodo al stage para manejar el cierre de ventana y finalizar completamente el programa
                     stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
                         public void handle(WindowEvent we) {
-
-                            nodo.getMc().eliminarPuerto(puerto.getText());
 
                             System.exit(0);
                         }
