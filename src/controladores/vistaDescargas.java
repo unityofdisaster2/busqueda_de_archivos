@@ -134,11 +134,8 @@ public class vistaDescargas extends javax.swing.JFrame {
         LinkedList<String> listaDescargas = mapaServidores.get(llaveHash);
         boolean flag = true;
         if(listaDescargas.contains(nodo.getDireccionIP()+":"+Integer.toString(nodo.getGlobalPort()+100))){
-            int opcion =  JOptionPane.showConfirmDialog(null, "Archivo ya existe con este MD5, descargar de todos modos?", "Atencion", JOptionPane.OK_OPTION);
-            System.out.println(opcion);
-            if(opcion == 2){
-                flag = false;
-            }
+            JOptionPane.showMessageDialog(null, "Archivo ya existe localmente con este MD5", "Atencion", JOptionPane.INFORMATION_MESSAGE);
+            flag = false;
         }
         if(flag){
             String hostRemoto;
