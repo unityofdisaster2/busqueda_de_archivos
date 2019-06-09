@@ -178,6 +178,7 @@ public class MulticastClient implements Runnable {
 
             }
             
+            controlVentana.actualizarEtiquetas(ptAnterior, ptSiguiente);
             
             //se establece puerto y host siguiente en el nodo
             controlVentana.getNodo().setPuertoSiguiente(ptSiguiente);
@@ -196,6 +197,8 @@ public class MulticastClient implements Runnable {
             listaPuertos.set(iA, aux);
             controlVentana.getNodo().actualizarPuertos();
 
+        }else{
+            controlVentana.actualizarEtiquetas(0, 0);
         }
 
     }
@@ -223,7 +226,7 @@ public class MulticastClient implements Runnable {
     }
     
     
-    
+    @SuppressWarnings("unchecked")
     public String recibirMensaje() {
         recibidos = new DatagramPacket(new byte[5000], 5000);
         try {

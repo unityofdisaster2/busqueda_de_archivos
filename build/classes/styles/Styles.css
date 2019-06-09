@@ -1,0 +1,20 @@
+.button {
+  /* default for <button>, but useful for <a> */
+  -fx-display: inline-block;
+  -fx-text-align: center;
+  -fx-text-decoration: none;
+  /* create a small space when buttons wrap on 2 lines */
+  -fx-margin: 2px 0;
+
+  /* invisible border (will be colored on hover/focus) */
+  -fx-border: solid 1px transparent;
+  -fx-border-radius: 4px;
+
+  /* size comes from text & padding (no width/height) */
+  -fx-padding: 0.5em 1em;
+
+  /* make sure colors have enough contrast! */
+  -fx-color: white;
+  -fx-background-color: #0095ff;
+}
+

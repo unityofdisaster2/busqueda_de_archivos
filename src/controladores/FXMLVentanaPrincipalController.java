@@ -9,18 +9,15 @@ import pnodo.Nodo;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
@@ -49,6 +46,11 @@ public class FXMLVentanaPrincipalController implements Initializable {
     ProgressBar progreso;
     @FXML
     ProgressIndicator indProgreso;
+    @FXML
+    Label lblSiguiente;
+    @FXML 
+    Label lblAnterior;
+    
     private LinkedList<String> listaMensajes;
     private ObservableList<String> elementosServidores;
     private Nodo nodo;
@@ -106,6 +108,22 @@ public class FXMLVentanaPrincipalController implements Initializable {
             nodo.getDs().turnOffFlag();
         }
     }
+    
+    public void actualizarEtiquetas(int et_anterior, int et_siguiente){
+        String ant,sig;
+        ant = Integer.toString(et_anterior);
+        sig = Integer.toString(et_siguiente);
+        Platform.runLater(() -> {
+            if(ant.equals("0") && sig.equals("0")){
+                lblAnterior.setText("");
+                lblSiguiente.setText("");
+                
+            }else{
+                lblAnterior.setText("nodo anterior:"+ant);
+                lblSiguiente.setText("nodo siguiente"+sig);
+            }
+        });
+    }
 
     /**
      * Metodo para actualizar los valores desplegados en la lista de servidores
@@ -114,15 +132,10 @@ public class FXMLVentanaPrincipalController implements Initializable {
      */
     @FXML
     public void actualizarLista(LinkedList<String> lista) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                elementosServidores = FXCollections.observableList(lista);
-                servidores.setItems(elementosServidores);
-                servidores.refresh();
-
-            }
-
+        Platform.runLater(() -> {
+            elementosServidores = FXCollections.observableList(lista);
+            servidores.setItems(elementosServidores);
+            servidores.refresh();
         });
 
     }
